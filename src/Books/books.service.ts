@@ -18,24 +18,25 @@ export class BooksService {
   }
 
   async findAll(): Promise<BookDocument[]> {
-    const books = await this.BookModel.find({});
-
-    return books;
+    return this.BookModel.find({});
   }
 
   async findOne(id: string): Promise<BookDocument> {
-    const book = await this.BookModel.findOne({ _id: id });
-    return book;
+    return this.BookModel.findOne({ _id: id });
   }
 
   async update(createBook: BookDto, id: string): Promise<BookDocument> {
-    const updatedBook = await this.BookModel.findByIdAndUpdate(id, createBook, {
+    return this.BookModel.findByIdAndUpdate(id, createBook, {
       new: true,
     });
-    return updatedBook;
   }
 
   async delete(id: string) {
-    await this.BookModel.findOneAndDelete({ _id: id });
+    return this.BookModel.findOneAndDelete({ _id: id });
+  }
+
+  // Для отладки
+  async deleteAll() {
+    await this.BookModel.deleteMany({});
   }
 }

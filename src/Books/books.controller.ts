@@ -27,13 +27,18 @@ export class BooksController {
     return this.bookService.findOne(id);
   }
 
-  @Put(':id')
+  @Put('update/:id')
   update(@Param('id') id: string, @Body() book: BookDto) {
     return this.bookService.update(book, id);
   }
 
-  @Delete(':id')
+  @Delete('delete/:id')
   delete(@Param('id') id: string) {
     return this.bookService.delete(id);
+  }
+
+  @Delete('delete')
+  deleteAll() {
+    return this.bookService.deleteAll();
   }
 }

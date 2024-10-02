@@ -9,6 +9,5 @@ import { BookSchema, Book } from './schemas/book.schema';
   ],
   controllers: [BooksController],
   providers: [BooksService],
-  exports: [BooksModule],
 })
 export class BooksModule {}
