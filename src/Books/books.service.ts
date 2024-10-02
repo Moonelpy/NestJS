@@ -1,40 +1,41 @@
 import { Injectable } from '@nestjs/common';
-import { Book } from './dto/book.dto';
+import { BookDto } from './dto/book.dto';
+import { InjectConnection, InjectModel } from '@nestjs/mongoose';
+import { Book, BookDocument } from './schemas/book.schema';
+import { Connection, Model } from 'mongoose';
 
 @Injectable()
 export class BooksService {
-  private booksDataBase: Book[] = [];
+  constructor(
+    @InjectModel(Book.name) private BookModel: Model<BookDocument>,
+    @InjectConnection() private connections: Connection,
+  ) {}
 
-  public createBook(book: Book) {
-    this.booksDataBase.push(book);
-    return this.booksDataBase.filter((i) => i.id === book.id);
+  async createBook(data): Promise<BookDocument> {
+    const newBook = await new this.BookModel(data);
+
+    return newBook.save();
   }
 
-  public findAll() {
-    return this.booksDataBase;
+  async findAll(): Promise<BookDocument[]> {
+    const books = await this.BookModel.find({});
+
+    return books;
   }
 
-  public findOne(id: string) {
-    return this.booksDataBase.find((item) => item.id === id);
-  }
-
-  public update(createBook: Book, id: string) {
-    const book = this.booksDataBase.find((item) => item.id === id);
-
-    if (!book) {
-      throw new Error(`Книга с ${id} не найдена`);
-    }
-
-    Object.assign(book, createBook);
+  async findOne(id: string): Promise<BookDocument> {
+    const book = await this.BookModel.findOne({ _id: id });
     return book;
   }
 
-  public delete(id: string) {
-    const index = this.booksDataBase.findIndex((item) => item.id === id);
-    if (index !== -1) {
-      this.booksDataBase.splice(index, 1);
-      return true;
-    }
-    return false;
+  async update(createBook: BookDto, id: string): Promise<BookDocument> {
+    const updatedBook = await this.BookModel.findByIdAndUpdate(id, createBook, {
+      new: true,
+    });
+    return updatedBook;
+  }
+
+  async delete(id: string) {
+    await this.BookModel.findOneAndDelete({ _id: id });
   }
 }
