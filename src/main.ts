@@ -5,7 +5,7 @@ import { ExRequestInterceptor } from './Books/interceptors/ex-request-intercepto
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   // Выключил Interceptor, т.к. он конфликтует с HttpExceptionFilter
-  app.useGlobalInterceptors(new ExRequestInterceptor());
+  // app.useGlobalInterceptors(new ExRequestInterceptor());
   await app.listen(3000);
 }
 bootstrap();
