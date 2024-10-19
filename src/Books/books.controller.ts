@@ -10,7 +10,7 @@ import {
   UsePipes,
 } from '@nestjs/common';
 import { BooksService } from './books.service';
-import { BookDto } from './dto/book.dto';
+import { IBook } from './interfaces/book.interface';
 import { JoiValidationPipe } from './validationJoi/JoiValidation.pipe';
 import { validationSchema } from './schemas/book.validation.schema';
 import { ObjectIdValidationPipe } from './pipe/ObjectId.validation.pipe';
@@ -24,7 +24,7 @@ export class BooksController {
 
   @UsePipes(new JoiValidationPipe(validationSchema))
   @Post()
-  createBook(@Body() book: BookDto) {
+  createBook(@Body() book: IBook) {
     return this.bookService.createBook(book);
   }
 
@@ -39,17 +39,18 @@ export class BooksController {
   }
 
   @Put('update/:id')
-  update(
+  async update(
     @Param('id', ObjectIdValidationPipe) id: string,
-    @Body() book: BookDto,
+    @Body() book: IBook,
   ) {
-    return this.bookService.update(book, id);
+    const updatedBook = await this.bookService.update(book, id);
+    return updatedBook;
   }
 
   @UseInterceptors(ExRequestInterceptor)
   @Delete('delete/:id')
-  delete(@Param('id') id: string) {
-    return this.bookService.delete(id);
+  async delete(@Param('id') id: string) {
+    return await this.bookService.delete(id);
   }
 
   @Delete('delete')

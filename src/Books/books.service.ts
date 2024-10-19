@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
-import { BookDto } from './dto/book.dto';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import { Book, BookDocument } from './schemas/book.schema';
 import { Connection, Model } from 'mongoose';
+import { IBook } from './interfaces/book.interface';
 
 @Injectable()
 export class BooksService {
@@ -11,10 +11,8 @@ export class BooksService {
     @InjectConnection() private connections: Connection,
   ) {}
 
-  async createBook(data): Promise<BookDocument> {
-    const newBook = await new this.BookModel(data);
-
-    return newBook.save();
+  async createBook(book: IBook): Promise<BookDocument> {
+    return await this.BookModel.create(book);
   }
 
   async findAll(): Promise<BookDocument[]> {
@@ -22,17 +20,21 @@ export class BooksService {
   }
 
   async findOne(id: string): Promise<BookDocument> {
-    return this.BookModel.findOne({ _id: id });
+    const bookById = await this.BookModel.findOne({ _id: id });
+    if (!bookById) {
+      throw new NotFoundException('Книга не найдена');
+    }
+    return bookById;
   }
 
-  async update(createBook: BookDto, id: string): Promise<BookDocument> {
+  async update(createBook: IBook, id: string): Promise<BookDocument> {
     return this.BookModel.findByIdAndUpdate(id, createBook, {
       new: true,
     });
   }
 
   async delete(id: string) {
-    return this.BookModel.findOneAndDelete({ _id: id });
+    return this.BookModel.findByIdAndDelete({ _id: id });
   }
 
   // Для отладки
