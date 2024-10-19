@@ -63,13 +63,23 @@ describe('BooksService(unit)', () => {
       authors: 'Л.Н. Толстой',
       favorite: true,
     };
-    const createdBook = { _id: '66fd9e273bc79a271210cb4d', ...book };
-    (modelBook.create as jest.Mock).mockResolvedValue(createdBook);
+
+    (modelBook.create as jest.Mock).mockResolvedValue(book);
 
     const result = await bookService.createBook(book);
 
-    expect(result).toEqual(createdBook);
+    expect(result).toEqual(book);
     expect(modelBook.create).toHaveBeenCalledWith(book);
+    expect(modelBook.create).toHaveBeenCalledTimes(1);
+  });
+
+  it('Ошибка при создании книги', async () => {
+    const errorMessage = 'Ошибка создания книги';
+    (modelBook.create as jest.Mock).mockRejectedValue(new Error(errorMessage));
+
+    await expect(bookService.createBook({ ...mockBook })).rejects.toThrow(
+      errorMessage,
+    );
   });
 
   it('Поиск книги', async () => {
